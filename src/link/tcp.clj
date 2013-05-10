@@ -25,9 +25,11 @@
         pipeline))))
 
 (defn get-ssl-handler [context client-mode?]
+  "takes the ssl-context object and client-mode flag and returns the
+   SslHandler object. client-mode is for the client."
   (SslHandler. (doto (.createSSLEngine context)
                  (.setIssueHandshake true)
-		             (.setUseClientMode client-mode?))))
+                 (.setUseClientMode client-mode?))))
 
 (defn- start-tcp-server [port handler encoder decoder threaded?
                          ordered tcp-options ssl-context]
@@ -68,7 +70,8 @@
                       ssl-context)))
 
 (defn tcp-client-factory [handler
-                          & {:keys [encoder decoder codec tcp-options]
+                          & {:keys [encoder decoder codec tcp-options
+                                    ssl-context]
                              :or {tcp-options {}}}]
   (let [encoder (netty-encoder (or encoder codec))
         decoder (netty-decoder (or decoder codec))
@@ -76,7 +79,11 @@
                    (NioClientSocketChannelFactory.
                     (Executors/newCachedThreadPool)
                     (Executors/newCachedThreadPool)))
-        handlers [encoder decoder handler]
+        handlers* [encoder decoder handler]
+        handlers (if ssl-context
+                   (concat [(get-ssl-handler ssl-context true)]
+                           handlers*)
+                   handlers*)
         pipeline (apply create-pipeline handlers)]
     (.setPipelineFactory bootstrap pipeline)
     (.setOptions bootstrap tcp-options)
