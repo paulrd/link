@@ -19,8 +19,8 @@
   (reify ChannelPipelineFactory
     (getPipeline [this]
       (let [pipeline (Channels/pipeline)]
-        (dorun (map-indexed 
-                  #(.addLast pipeline (str "handler-" %1) %2) 
+        (dorun (map-indexed
+                  #(.addLast pipeline (str "handler-" %1) %2)
                   handlers))
         pipeline))))
 
@@ -132,4 +132,3 @@
           (makeObject [this] (maker))
           (destroyObject [this client] (close client))
           (validateObject [this client] (valid? client)))))
-
