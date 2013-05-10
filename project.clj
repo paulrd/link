@@ -1,4 +1,4 @@
-(defproject org.clojars.pauld/link "0.5.0-SNAPSHOT"
+(defproject cawala/link "0.5.0"
   :description
   "A straightforward (not-so-clojure) clojure wrapper for java nio framework.
    This fork provides tls support. Now with tls and server shutdown."
